@@ -8,45 +8,20 @@ import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RunWith(Parameterized.class)
 public class BurgerTest {
-    private final String bunName;
-    private final float bunPrice;
-    private final IngredientType ingredientChoice;
-    private final float ingredientPrice;
-    private final String ingredientName;
-    private final float burgerPrice;
+    @Spy
+    Bun bun = new Bun("Булочка", 99.99F);
 
-    public BurgerTest(String bunName, float bunPrice, IngredientType ingredientChoice, float ingredientPrice, String ingredientName, float burgerPrice) {
-        this.bunName = bunName;
-        this.bunPrice = bunPrice;
-        this.ingredientChoice = ingredientChoice;
-        this.ingredientPrice = ingredientPrice;
-        this.ingredientName = ingredientName;
-        this.burgerPrice = burgerPrice;
-    }
+    @Spy
+    Ingredient ingredient = new Ingredient(IngredientType.SAUCE, "Соус", 109.99F);
 
-    @Mock
-    Bun bun;
-
-    @Mock
-    Ingredient ingredient;
-
-    @Mock
-    Ingredient ingredientAnother;
-
-    @Parameterized.Parameters(name = "{index}: checkBurgerPrice {5}")
-    public static Object[][] getTestData() {
-        return new Object[][] {
-                {"Булочка", 99.99F, IngredientType.SAUCE, 109.99F, "Соус", 309.97F},
-                {"Хлебушек", 59.99F, IngredientType.FILLING, 59.99F, "Колбаска", 179.97F},
-                {"Булка5000", 299.99F, IngredientType.FILLING, 599.99F, "5кг ингридиентов", 1199.97F}
-        };
-    }
+    @Spy
+    Ingredient ingredientAnother = new Ingredient(IngredientType.FILLING, "Колбаска", 59.99F);
 
     @Before
     public void init() {
@@ -106,17 +81,6 @@ public class BurgerTest {
     }
 
     @Test
-    public void getPriceTest() {
-        Burger burger = new Burger();
-        Bun bun = new Bun(bunName, bunPrice);
-        Ingredient ingredient = new Ingredient(ingredientChoice, ingredientName, ingredientPrice);
-        burger.setBuns(bun);
-        burger.addIngredient(ingredient);
-        float actual = burger.getPrice();
-        Assert.assertEquals(burgerPrice, actual, 0);
-    }
-
-    @Test
     public void getReceiptTest() {
         Burger burger = Mockito.spy(new Burger());
         burger.setBuns(bun);
@@ -124,8 +88,6 @@ public class BurgerTest {
         List<Ingredient> ingredients = new ArrayList<>();
         ingredients.add(ingredient);
         ingredients.add(ingredientAnother);
-        Mockito.when(ingredient.getType()).thenReturn(IngredientType.FILLING);
-        Mockito.when(ingredientAnother.getType()).thenReturn(IngredientType.FILLING);
 
         for (Ingredient ingredient : ingredients) {
             burger.addIngredient(ingredient);
@@ -134,11 +96,16 @@ public class BurgerTest {
         burger.getReceipt();
 
         Mockito.verify(bun, Mockito.times(2)).getName();
+        Assert.assertEquals("Булочка", bun.getName());
         Mockito.verify(ingredient, Mockito.times(1)).getName();
+        Assert.assertEquals("Соус", ingredient.getName());
         Mockito.verify(ingredientAnother, Mockito.times(1)).getName();
+        Assert.assertEquals("Колбаска", ingredientAnother.getName());
         Mockito.verify(ingredient, Mockito.times(1)).getType();
+        Assert.assertEquals(IngredientType.SAUCE, ingredient.getType());
         Mockito.verify(ingredientAnother, Mockito.times(1)).getType();
-        Mockito.verify(ingredientAnother, Mockito.times(1)).getType();
+        Assert.assertEquals(IngredientType.FILLING, ingredientAnother.getType());
         Mockito.verify(burger, Mockito.times(1)).getPrice();
+        Assert.assertEquals(369.96F, burger.getPrice(), 0);
     }
 }
