@@ -3,9 +3,6 @@ package praktikum;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -93,19 +90,19 @@ public class BurgerTest {
             burger.addIngredient(ingredient);
         }
 
-        burger.getReceipt();
+        String actual = burger.getReceipt();
 
         Mockito.verify(bun, Mockito.times(2)).getName();
-        Assert.assertEquals("Булочка", bun.getName());
         Mockito.verify(ingredient, Mockito.times(1)).getName();
-        Assert.assertEquals("Соус", ingredient.getName());
         Mockito.verify(ingredientAnother, Mockito.times(1)).getName();
-        Assert.assertEquals("Колбаска", ingredientAnother.getName());
         Mockito.verify(ingredient, Mockito.times(1)).getType();
-        Assert.assertEquals(IngredientType.SAUCE, ingredient.getType());
         Mockito.verify(ingredientAnother, Mockito.times(1)).getType();
-        Assert.assertEquals(IngredientType.FILLING, ingredientAnother.getType());
         Mockito.verify(burger, Mockito.times(1)).getPrice();
-        Assert.assertEquals(369.96F, burger.getPrice(), 0);
+
+
+        String expected = String.format("(==== Булочка ====)%n= sauce Соус =%n= filling Колбаска =%n(==== Булочка ====)%n%nPrice: 369,959991%n");
+        Assert.assertEquals(expected, actual);
     }
 }
+
+
